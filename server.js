@@ -7,7 +7,14 @@ const socketIO = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const io = socketIO(server, {
+  cors: {
+    origin: "*", // Configura con gli origine consentiti in produzione
+    methods: ["GET", "POST"]
+  },
+  transports: ['polling', 'websocket'], // Garantisce il fallback al polling
+  allowEIO3: true // Retrocompatibilità
+});
 
 const chatStore = require("./chatStore");
 
@@ -22,12 +29,24 @@ app.use(express.json());
 // Cartella per file statici (es. CSS, client-side JS)
 app.use(express.static(path.join(__dirname, "public")));
 
-// Configurazione delle sessioni con cookie sicuro e parametri migliorati
+// Configurazione delle sessioni con store MongoDB
+const MongoStore = require('connect-mongo');
+
+// Usa un file di sessione locale se non siamo in produzione
+const sessionStore = process.env.NODE_ENV === 'production' && process.env.MONGODB_URI
+  ? MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+      ttl: 60 * 60 * 24 // 1 giorno in secondi
+    })
+  : null; // Userà MemoryStore in sviluppo
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "mio_segreto_super_sicuro",
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
     cookie: { 
       secure: process.env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60 * 24 // 1 giorno
