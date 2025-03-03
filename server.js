@@ -46,12 +46,9 @@ app.use(
     secret: "mio_segreto_super_sicuro",
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // Abilita secure in produzione (HTTPS)
-      maxAge: 24 * 60 * 60 * 1000, // 1 giorno di durata
-    },
   })
 );
+
 
 // Rotte di autenticazione, gruppi, contenuti e dossier
 const authRoutes = require("./routes/authRoutes");
