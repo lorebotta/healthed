@@ -43,15 +43,14 @@ const sessionStore = process.env.NODE_ENV === 'production' && process.env.MONGOD
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "mio_segreto_super_sicuro",
+    secret: "mio_segreto_super_sicuro",
     resave: false,
     saveUninitialized: false,
-    store: sessionStore,
-    cookie: { 
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 24 // 1 giorno
-    }
-  }),
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // Abilita secure in produzione (HTTPS)
+      maxAge: 24 * 60 * 60 * 1000, // 1 giorno di durata
+    },
+  })
 );
 
 // Rotte di autenticazione, gruppi, contenuti e dossier
