@@ -22,12 +22,16 @@ app.use(express.json());
 // Cartella per file statici (es. CSS, client-side JS)
 app.use(express.static(path.join(__dirname, "public")));
 
-// Configurazione delle sessioni (usa un secret sicuro)
+// Configurazione delle sessioni con cookie sicuro e parametri migliorati
 app.use(
   session({
-    secret: "mio_segreto_super_sicuro",
+    secret: process.env.SESSION_SECRET || "mio_segreto_super_sicuro",
     resave: false,
     saveUninitialized: false,
+    cookie: { 
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 // 1 giorno
+    }
   }),
 );
 
@@ -69,6 +73,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server avviato sulla porta ${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server avviato sulla porta ${PORT} su 0.0.0.0`);
 });
