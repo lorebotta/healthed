@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Dossier Sanitario</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <!-- Logo della scuola -->
+      <img src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" alt="Logo Scuola">
+      <!-- Logo dell'app -->
+      <img src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" alt="Logo App" class="app-logo">
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/groups">Gruppi</a>
+      <a href="/content">Contenuti</a>
+      <a href="/dossier">Dossier</a>
+      <div class="user-dropdown">
+        <div class="user-icon"><%= user.fullName.charAt(0).toUpperCase() %></div>
+        <div class="user-dropdown-content">
+          <div class="user-fullname"><%= user.fullName %></div>
+          <a href="/logout">Disconnetti</a>
+        </div>
+      </div>
+      <a href="/logout" class="mobile-only">Disconnetti</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+  <div class="dossier-header">
+    <h1>Dossier Sanitario Interattivo</h1>
+    <div class="disclaimer-box">
+      <h3>⚠️ Avviso Importante</h3>
+      <p>Queste informazioni sono fornite solo a scopo educativo e non costituiscono una diagnosi medica. Consulta sempre un professionista sanitario per una valutazione accurata dei tuoi sintomi. Contatta il tuo medico per qualsiasi dubbio o preoccupazione.</p>
+    </div>
+  </div>
+  <div class="dossier-content">
+    <div class="dossier-sidebar">
+      <div class="card card-symptom">
+        <h2>Seleziona Sintomi</h2>
+        <form action="/dossier/add" method="POST">
+          <label for="symptomSelect" class="label-field">Sintomo:</label>
+          <select name="symptom" id="symptomSelect" required>
+            <% symptomData.forEach(sd => { %>
+              <option value="<%= sd.symptom %>"><%= sd.symptom %></option>
+            <% }); %>
+          </select>
+          <button type="submit" class="btn-primary">Aggiungi</button>
+        </form>
+      </div>
+      <div class="card card-history">
+        <h2>Storico Sintomi Registrati</h2>
+        <% if (records.length === 0) { %>
+          <p class="no-history">Nessun sintomo registrato</p>
+        <% } else { %>
+          <% records.forEach(r => { %>
+            <div class="record-row">
+              <div>
+                <strong><%= r.symptom %></strong><br>
+                <small>Registrato il <%= new Date(r.createdAt).toLocaleString() %></small>
+              </div>
+              <form action="/dossier/<%= r.id %>/delete" method="POST">
+                <button type="submit" class="delete-button">✕</button>
+              </form>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+    <div class="dossier-main">
+      <div class="card card-analysis">
+        <h2>Analisi Sintomi</h2>
+        <p class="analysis-info">
+          Seleziona un sintomo dal menu sottostante per visualizzare informazioni e raccomandazioni.
+        </p>
+        <label for="symptomSelector" class="label-field">Sintomo da Analizzare:</label>
+        <select id="symptomSelector">
+          <option value="">-- Seleziona --</option>
+          <% symptomData.forEach(sd => { %>
+            <option value="<%= sd.symptom %>"><%= sd.symptom %></option>
+          <% }); %>
+        </select>
+        <div id="symptomDetails" class="symptom-details"></div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p>HealthEdu &copy; 2025</p>
+  </footer>
+  <script>
+    function toggleMenu() {
+      document.querySelector('.navbar nav').classList.toggle('open');
+    }
+
+    document.querySelector('.user-icon').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelector('.user-dropdown-content').classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.matches('.user-icon')) {
+        const dropdowns = document.getElementsByClassName('user-dropdown-content');
+        for (const dropdown of dropdowns) {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      }
+    });
+  </script>
+  <script>
+    document.getElementById('symptomSelector').addEventListener('change', async function() {
+      const symptom = this.value;
+      const detailsContainer = document.getElementById('symptomDetails');
+      if (!symptom) {
+        detailsContainer.innerHTML = "";
+        return;
+      }
+      try {
+        const res = await fetch(`/dossier/${symptom}`);
+        const data = await res.json();
+        let detailsHtml = `<h3>${symptom}</h3>`;
+        data.conditions.forEach(c => {
+          detailsHtml += `
+            <div class="condition-box">
+              <h4>${c.name}</h4>
+              <p><strong>Descrizione:</strong> ${c.descrizione}</p>
+              <p><strong>Fattori di rischio:</strong> ${c.fattori}</p>
+              <p><strong>Misure preventive:</strong> ${c.preventive}</p>
+            </div>
+          `;
+        });
+        detailsContainer.innerHTML = detailsHtml;
+      } catch (error) {
+        detailsContainer.innerHTML = "Errore nel recuperare i dettagli.";
+      }
+    });
+  </script>
+</body>
+</html>

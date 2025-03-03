@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Chat del Gruppo</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <img src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" alt="Logo">
+      <img src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" alt="Logo App" class="app-logo">
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/groups">Gruppi</a>
+      <a href="/content">Contenuti</a>
+      <a href="/dossier">Dossier</a>
+      <div class="user-dropdown">
+        <div class="user-icon"><%= user.fullName.charAt(0).toUpperCase() %></div>
+        <div class="user-dropdown-content">
+          <div class="user-fullname"><%= user.fullName %></div>
+          <a href="/logout">Disconnetti</a>
+        </div>
+      </div>
+      <a href="/logout" class="mobile-only">Disconnetti</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+  <div class="container">
+    <h1>Chat del Gruppo: <%= group.name %></h1>
+    <div id="messages"></div>
+    <form id="chatForm">
+      <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off">
+      <button type="submit">Invia</button>
+    </form>
+  </div>
+  <footer class="footer">
+    <p>HealthEdu &copy; 2025</p>
+  </footer>
+  <script>
+    const socket = io();
+    const groupId = "<%= group.id %>";
+    socket.emit("joinGroup", groupId);
+
+    socket.on("chatHistory", function(history) {
+      const messagesDiv = document.getElementById("messages");
+      history.forEach(message => {
+        const msgElem = document.createElement("div");
+        msgElem.textContent = message.user + ": " + message.message;
+        messagesDiv.appendChild(msgElem);
+      });
+    });
+
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const messagesDiv = document.getElementById('messages');
+
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if(message) {
+        const msgData = {
+          groupId: groupId,
+          user: "<%= user.username %>",
+          message: message
+        };
+        socket.emit('chatMessage', msgData);
+        chatInput.value = '';
+      }
+    });
+
+    socket.on('chatMessage', function(msgData) {
+      const msgElem = document.createElement('div');
+      msgElem.textContent = msgData.user + ": " + msgData.message;
+      messagesDiv.appendChild(msgElem);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Login</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Card principale -->
+    <div class="auth-card">
+      <!-- Sezione loghi -->
+      <div class="auth-logos">
+        <!-- Logo della scuola -->
+        <img 
+          src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" 
+          alt="Logo Scuola" 
+          class="school-logo"
+        >
+        <!-- Logo dell'app -->
+        <img 
+          src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" 
+          alt="Logo App" 
+          class="app-logo"
+        >
+      </div>
+
+      <!-- Sezione tab -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="location.href='/login'">
+          Accedi
+        </button>
+        <button class="auth-tab" onclick="location.href='/register'">
+          Registrati
+        </button>
+      </div>
+
+      <!-- Form di login -->
+      <form action="/login" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="username">Nome Utente</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required
+          >
+        </div>
+        <button type="submit" class="auth-button">
+          Accedi
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

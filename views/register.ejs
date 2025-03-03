@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Registrazione</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Card principale -->
+    <div class="auth-card">
+      <!-- Sezione loghi -->
+      <div class="auth-logos">
+        <!-- Logo della scuola -->
+        <img 
+          src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" 
+          alt="Logo Scuola" 
+          class="school-logo"
+        >
+        <!-- Logo dell'app -->
+        <img 
+          src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" 
+          alt="Logo App" 
+          class="app-logo"
+        >
+      </div>
+
+      <!-- Sezione tab -->
+      <div class="auth-tabs">
+        <button class="auth-tab" onclick="location.href='/login'">
+          Accedi
+        </button>
+        <button class="auth-tab active" onclick="location.href='/register'">
+          Registrati
+        </button>
+      </div>
+
+      <!-- Form di registrazione -->
+      <form action="/register" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="username">Nome Utente</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="fullName">Nome Completo</label>
+          <input 
+            type="text" 
+            id="fullName" 
+            name="fullName" 
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="role">Ruolo</label>
+          <select id="role" name="role" required>
+            <option value="Student">Studente</option>
+            <option value="Tutor">Tutor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="year">Anno</label>
+          <select id="year" name="year" required>
+            <option value="1">1° Anno</option>
+            <option value="2">2° Anno</option>
+            <option value="3">3° Anno</option>
+            <option value="4">4° Anno</option>
+            <option value="5">5° Anno</option>
+          </select>
+        </div>
+        <button type="submit" class="auth-button">
+          Registrati
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

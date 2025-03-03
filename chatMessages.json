@@ -1,0 +1,40 @@
+{
+  "2": [
+    {
+      "groupId": "2",
+      "user": "Angela",
+      "message": "Ciao Francesco, ho appena visto il tuo nuovo contenuto sui consigli nutrizionali. Grazie, è stato molto utile!",
+      "timestamp": "2025-02-27T15:56:01.346Z"
+    },
+    {
+      "groupId": "2",
+      "user": "Francesco",
+      "message": "Ciao Angela! Mi fa piacere che ti sia stato utile. Se hai dubbi o domande più specifiche, scrivimi pure",
+      "timestamp": "2025-02-27T15:56:40.272Z"
+    },
+    {
+      "groupId": "2",
+      "user": "Angela",
+      "message": "Ok, grazie! Vorrei chiederti alcune cose sui cibi da evitare prima di fare attività fisica. Mi sposto nella sezione Q&A, così le domande rimangono disponibili anche per gli altri",
+      "timestamp": "2025-02-27T15:56:59.865Z"
+    },
+    {
+      "groupId": "2",
+      "user": "Francesco",
+      "message": "Perfetto, ti aspetto nella sezione Q&A.",
+      "timestamp": "2025-02-27T15:57:13.416Z"
+    },
+    {
+      "groupId": "2",
+      "user": "Francesco",
+      "message": "Se avete altre domande non esitate a scrivermi",
+      "timestamp": "2025-02-27T16:18:58.660Z"
+    },
+    {
+      "groupId": "2",
+      "user": "Angela",
+      "message": "Grazie mille per l’aiuto",
+      "timestamp": "2025-02-27T16:24:49.557Z"
+    }
+  ]
+}

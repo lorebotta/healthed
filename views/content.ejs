@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Contenuti Educativi</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <!-- Logo della scuola -->
+      <img src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" alt="Logo Scuola">
+      <!-- Logo dell'app -->
+      <img src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" alt="Logo App" class="app-logo">
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/groups">Gruppi</a>
+      <a href="/content">Contenuti</a>
+      <a href="/dossier">Dossier</a>
+      <div class="user-dropdown">
+        <div class="user-icon"><%= user.fullName.charAt(0).toUpperCase() %></div>
+        <div class="user-dropdown-content">
+          <div class="user-fullname"><%= user.fullName %></div>
+          <a href="/logout">Disconnetti</a>
+        </div>
+      </div>
+      <a href="/logout" class="mobile-only">Disconnetti</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+  <div class="container">
+    <h1>Contenuti Educativi</h1>
+    <form class="search-form" action="/content" method="GET">
+      <input type="text" name="search" class="search-input" placeholder="Cerca contenuti..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+      <button type="submit">Cerca</button>
+    </form>
+    <div class="content-section">
+      <% if (user.role === 'Tutor') { %>
+        <div class="publish-content">
+          <h2>Crea un nuovo Contenuto</h2>
+          <form action="/content/create" method="POST">
+            <div>
+              <label>Titolo:</label>
+              <input type="text" name="title" required>
+            </div>
+            <div>
+              <label>Categoria:</label>
+              <select name="category" required>
+                <option value="nutrizione">Nutrizione</option>
+                <option value="vaccini">Vaccini</option>
+                <option value="screening">Screening</option>
+                <option value="esercizio-fisico">Esercizio Fisico</option>
+              </select>
+            </div>
+            <div>
+              <label>Contenuto:</label>
+              <textarea name="body" required></textarea>
+            </div>
+            <button type="submit">Pubblica</button>
+          </form>
+        </div>
+      <% } %>
+      <hr>
+      <div class="content-list">
+        <% if (contents.length > 0) { %>
+          <% contents.forEach(c => { %>
+            <div class="card content-card">
+              <h3><%= c.title %></h3>
+              <p><strong>Categoria:</strong> <%= c.category %></p>
+              <p><%= c.body %></p>
+              <small>Pubblicato il <%= new Date(c.createdAt).toLocaleString() %></small>
+              <% if (user.role === 'Tutor' && c.author == user.id) { %>
+                <form action="/content/<%= c.id %>/delete" method="POST" style="margin-top:10px;">
+                  <button type="submit" class="delete-button"><img src="https://i.ibb.co/fGNjDqdQ/Progetto-senza-titolo-5.png" alt="Elimina" class="icon-image"> Elimina Contenuto</button>
+                </form>
+              <% } %>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p>Nessun contenuto disponibile.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p>HealthEdu &copy; 2025</p>
+  </footer>
+  <script>
+    document.querySelector('.user-icon').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelector('.user-dropdown-content').classList.toggle('show');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.matches('.user-icon')) {
+        const dropdowns = document.getElementsByClassName('user-dropdown-content');
+        for (const dropdown of dropdowns) {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

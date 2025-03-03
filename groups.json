@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Benessere & Prevenzione",
+    "description": "Un gruppo dedicato a consigli nutrizionali e attività fisica per mantenersi in salute.",
+    "tutor": 1740671011047,
+    "id": 2,
+    "members": [
+      1740671026112
+    ],
+    "questions": [
+      {
+        "id": 1,
+        "author": {
+          "id": 1740671026112,
+          "username": "Angela",
+          "fullName": "Angela",
+          "role": "Student",
+          "year": "1"
+        },
+        "text": "Quali cibi dovrei evitare prima di fare esercizio fisico per non sentirmi appesantita?",
+        "isPublic": true,
+        "createdAt": "2025-02-27T15:55:14.163Z",
+        "answers": [
+          {
+            "id": 1,
+            "author": {
+              "id": 1740671011047,
+              "username": "Francesco",
+              "fullName": "Francesco",
+              "role": "Tutor",
+              "year": "5"
+            },
+            "text": "Per evitare di sentirti appesantita prima di un allenamento, ti suggerisco di non mangiare cibi troppo ricchi di grassi o ad alto contenuto di fibre (ad esempio fritture, formaggi molto grassi o pasti abbondanti). Un pasto leggero a base di carboidrati complessi (come pane integrale, frutta, cereali) e un po’ di proteine magre (come pollo o pesce leggero) è l’ideale.",
+            "createdAt": "2025-02-27T15:57:29.884Z"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "author": {
+          "id": 1740671026112,
+          "username": "Angela",
+          "fullName": "Angela",
+          "role": "Student",
+          "year": "1"
+        },
+        "text": "È vero che bere troppa acqua durante l’allenamento può far male?",
+        "isPublic": false,
+        "createdAt": "2025-02-27T15:55:41.641Z",
+        "answers": [
+          {
+            "id": 1,
+            "author": {
+              "id": 1740671011047,
+              "username": "Francesco",
+              "fullName": "Francesco",
+              "role": "Tutor",
+              "year": "5"
+            },
+            "text": "È importante idratarsi bene durante l’allenamento, ma senza esagerare. Bere troppa acqua in un tempo troppo breve può causare uno squilibrio di sali minerali (iponatriemia). Tuttavia, se bevi a piccoli sorsi regolari e ascolti la sete, in genere non ci sono problemi. In allenamenti molto intensi o prolungati, è utile aggiungere soluzioni saline o bevande per lo sport.",
+            "createdAt": "2025-02-27T15:57:53.457Z"
+          }
+        ]
+      }
+    ],
+    "content": [
+      {
+        "id": 1,
+        "title": "Esercizi di stretching quotidiano",
+        "body": "Lo stretching giornaliero può aiutare a prevenire infortuni e a \nmantenere la flessibilità.\n\nEsempi di esercizi: \n- Allungamento braccia e spalle \n- Stretching del polpaccio \n- Flessione del busto",
+        "createdAt": "2025-02-27T15:50:35.036Z",
+        "author": {
+          "id": 1740671011047,
+          "username": "Francesco",
+          "fullName": "Francesco",
+          "role": "Tutor",
+          "year": "5"
+        }
+      }
+    ]
+  }
+]

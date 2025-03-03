@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Gruppi</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <!-- Logo della scuola -->
+      <img src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" alt="Logo Scuola">
+      <!-- Logo dell'app -->
+      <img src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" alt="Logo App" class="app-logo">
+  </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/groups">Gruppi</a>
+      <a href="/content">Contenuti</a>
+      <a href="/dossier">Dossier</a>
+      <div class="user-dropdown">
+        <div class="user-icon"><%= user.fullName.charAt(0).toUpperCase() %></div>
+        <div class="user-dropdown-content">
+          <div class="user-fullname"><%= user.fullName %></div>
+          <a href="/logout">Disconnetti</a>
+        </div>
+      </div>
+      <a href="/logout" class="mobile-only">Disconnetti</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+
+  <div class="container">
+    <div class="groups-header">
+      <h1><%= user.role === 'Tutor' ? 'I Tuoi Gruppi' : 'Gruppi Disponibili' %></h1>
+      <% if (user.role === 'Tutor') { %>
+        <button onclick="openModal()" class="create-group-btn">+ Crea Gruppo</button>
+
+        <!-- Modal -->
+        <div id="createGroupModal" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Crea Nuovo Gruppo</h2>
+            <form action="/groups/create" method="POST">
+              <input type="text" name="groupName" placeholder="Nome del gruppo" required class="group-input">
+              <textarea name="description" placeholder="Descrizione del gruppo" required class="group-input" style="min-height: 80px;"></textarea>
+              <button type="submit" class="create-group-btn" style="width: 100%">Crea Gruppo</button>
+            </form>
+          </div>
+        </div>
+
+        <script>
+          function openModal() {
+            document.getElementById('createGroupModal').style.display = 'block';
+          }
+
+          function closeModal() {
+            document.getElementById('createGroupModal').style.display = 'none';
+          }
+
+          window.onclick = function(event) {
+            const modal = document.getElementById('createGroupModal');
+            if (event.target == modal) {
+              modal.style.display = 'none';
+            }
+          }
+        </script>
+      <% } %>
+    </div>
+
+    <div class="welcome-card">
+      <h2>Benvenuto, <%= user.fullName %></h2>
+      <p>
+        <% if (user.role === 'Tutor') { %>
+          Crea e gestisci i tuoi gruppi di educazione alla salute. Condividi contenuti preziosi con i tuoi studenti.
+        <% } else { %>
+          Esplora i gruppi disponibili e unisciti a loro per iniziare a imparare sull'educazione alla salute da tutor esperti.
+        <% } %>
+      </p>
+    </div>
+
+    <div class="search-container">
+      <input type="text" name="search" class="search-input" placeholder="Cerca gruppi..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+    </div>
+    <script>
+      const searchInput = document.querySelector('.search-input');
+      searchInput.addEventListener('input', (e) => {
+        window.location.href = `/groups?search=${e.target.value}`;
+      });
+    </script>
+
+    <div class="groups-grid">
+      <% groups.forEach(group => { %>
+        <div class="group-card">
+          <div class="group-header">
+            <h3><%= group.name %></h3>
+            <span class="member-count"><img src="https://i.ibb.co/8gFWpDjC/Progetto-senza-titolo-6.png" alt="Membri" class="icon-image"> <%= group.members.length %></span>
+          </div>
+          <p class="group-description"><%= group.description || 'Nessuna descrizione disponibile' %></p>
+          <div class="group-actions">
+            <% if (user.role === 'Tutor' && group.tutor == user.id) { %>
+              <form action="/groups/<%= group.id %>/delete" method="POST" style="display: inline;">
+                <button type="submit" class="delete-btn">Elimina Gruppo</button>
+              </form>
+            <% } else if (user.role === 'Student') { %>
+              <% if (group.members.includes(user.id)) { %>
+                <form action="/groups/<%= group.id %>/leave" method="POST" style="display: inline;">
+                  <button type="submit" class="leave-btn">Leave Group</button>
+                </form>
+              <% } else { %>
+                <form action="/groups/<%= group.id %>/join" method="POST" style="display: inline;">
+                  <button type="submit" class="join-btn">Join Group</button>
+                </form>
+              <% } %>
+            <% } %>
+            <a href="/groups/<%= group.id %>/chat" class="chat-btn" style="text-decoration: none; width: 100%; text-align: center;">Hub</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>HealthEdu &copy; 2025</p>
+  </footer>
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+    // User dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const userIcon = document.querySelector('.user-icon');
+      const dropdownContent = document.querySelector('.user-dropdown-content');
+
+      if (userIcon && dropdownContent) {
+        userIcon.addEventListener('click', function(e) {
+          e.stopPropagation();
+          dropdownContent.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+          if (!e.target.matches('.user-icon') && dropdownContent.classList.contains('show')) {
+            dropdownContent.classList.remove('show');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

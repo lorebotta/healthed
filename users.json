@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1740420367721,
+    "username": "test - tutor",
+    "password": "$2b$10$5.BYM0eWzRc7MerO.RH5iumH8N5xCl4z3sHjSRUjcf.WHPN06Ggma",
+    "fullName": "test - tutor",
+    "role": "Tutor",
+    "year": "4"
+  },
+  {
+    "id": 1740492345137,
+    "username": "test - student",
+    "password": "$2b$10$X/uPeAi2NVh1V5ByiXmgUeH7enjLYn2gNqoPOdjkn7EuIPl/WcwpW",
+    "fullName": "test - student",
+    "role": "Student",
+    "year": "1"
+  },
+  {
+    "id": 1740671011047,
+    "username": "Francesco",
+    "password": "$2b$10$8HNt51QiRQ1FJk51SzYTr.nWR6fUm.ET3c5CVNrBlhndGJxPUBv2W",
+    "fullName": "Francesco",
+    "role": "Tutor",
+    "year": "5"
+  },
+  {
+    "id": 1740671026112,
+    "username": "Angela",
+    "password": "$2b$10$nidDWOjZcKKCBqDYk3//9OJKCH0KO3QNS1apdMrmmoKbYITS4Zj9.",
+    "fullName": "Angela",
+    "role": "Student",
+    "year": "1"
+  }
+]

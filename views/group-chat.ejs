@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HealthEdu - Chat di Gruppo</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <!-- Logo della scuola -->
+      <img src="https://www.ittmarcopolo.edu.it/images/template/Marco-Polo-Trasparente-piccolo.png" alt="Logo Scuola">
+      <!-- Logo dell'app -->
+      <img src="https://i.ibb.co/bg6w36b5/7556acca-09d1-4f13-b598-850b9c688c14.png" alt="Logo App" class="app-logo">
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav>
+      <a href="/groups">Gruppi</a>
+      <a href="/content">Contenuti</a>
+      <a href="/dossier">Dossier</a>
+      <div class="user-dropdown">
+        <div class="user-icon"><%= user.fullName.charAt(0).toUpperCase() %></div>
+        <div class="user-dropdown-content">
+          <div class="user-fullname"><%= user.fullName %></div>
+          <a href="/logout">Disconnetti</a>
+        </div>
+      </div>
+      <a href="/logout" class="mobile-only">Disconnetti</a>
+    </nav>
+  </header>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.querySelector('nav');
+      const hamburger = document.querySelector('.hamburger');
+      nav.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    // Chiudi il menu quando si clicca su un link
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('nav').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+
+  <div class="container">
+    <div class="tab-container">
+      <button class="tab-button active" onclick="activateTab('chat', event)">Chat</button>
+      <button class="tab-button" onclick="activateTab('questions', event)">Q&A</button>
+      <button class="tab-button" onclick="activateTab('content', event)">Contenuti</button>
+
+      <!-- Pulsante Abbandona Gruppo per Studenti (spostato accanto alle tab) -->
+      <% if (user.role === 'Student') { %>
+        <div class="group-controls" style="margin-left: auto;">
+          <form action="/groups/<%= group.id %>/leave" method="POST" style="display: inline;">
+            <button type="submit" class="leave-group-btn">Abbandona Gruppo</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Tab Chat -->
+    <div id="chatTab" class="tab-content">
+      <div class="chat-container" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
+        <div id="chatMessages" style="min-height: 200px; margin-bottom: 1rem; overflow-y: auto;"></div>
+        <form id="chatForm">
+          <input type="text" id="chatInput" placeholder="Scrivi un messaggio..." autocomplete="off" style="width: 80%; padding: 0.5rem;">
+          <button type="submit" class="btn-primary" style="padding: 0.5rem 1rem;">Invia</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+      const groupId = "<%= group.id %>";
+      const chatMessages = document.getElementById("chatMessages");
+      const chatForm = document.getElementById("chatForm");
+      const chatInput = document.getElementById("chatInput");
+
+      socket.emit("joinGroup", groupId);
+
+      socket.on("chatHistory", function(history) {
+        history.forEach(message => {
+          appendMessage(message);
+        });
+      });
+
+      socket.on("chatMessage", function(msgData) {
+        appendMessage(msgData);
+      });
+
+      chatForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (message) {
+          const msgData = {
+            groupId: groupId,
+            user: "<%= user.username %>",
+            message: message
+          };
+          socket.emit("chatMessage", msgData);
+          chatInput.value = "";
+        }
+      });
+
+      function appendMessage(msgData) {
+        const msgElem = document.createElement("div");
+        msgElem.style.marginBottom = "8px";
+        msgElem.textContent = `${msgData.user}: ${msgData.message}`;
+        chatMessages.appendChild(msgElem);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    </script>
+
+    <!-- Tab Q&A -->
+    <div id="questionsTab" class="tab-content" style="display: none;">
+      <div class="card">
+        <% if (user.role === 'Student') { %>
+          <form id="askForm">
+            <h3 style="color: white; margin-bottom: 1rem;">Fai una domanda al tutor</h3>
+            <textarea id="questionInput" placeholder="Scrivi la tua domanda..." rows="3" required></textarea>
+            <div class="visibility-options">
+              <label>
+                <input type="radio" name="visibility" value="public" checked>
+                <span>Pubblica</span>
+              </label>
+              <label>
+                <input type="radio" name="visibility" value="private">
+                <span>Privata</span>
+              </label>
+            </div>
+            <button type="submit" class="btn-primary">Invia Domanda</button>
+          </form>
+        <% } %>
+        <div id="questionsList" class="dynamic-content">
+          <% if (group.questions && group.questions.length > 0) { %>
+            <% group.questions.forEach(q => { %>
+              <div class="card question-card" data-question-id="<%= q.id %>">
+                <div class="question-header">
+                  <span class="chip"><%= q.author.fullName %></span>
+                  <small><%= new Date(q.createdAt).toLocaleDateString() %></small>
+                  <% if (!q.isPublic) { %>
+                    <span class="visibility-label">(Privata)</span>
+                  <% } else { %>
+                    <span class="visibility-label">(Pubblica)</span>
+                  <% } %>
+                </div>
+                <p><%= q.text %></p>
+                <% if (q.answers && q.answers.length > 0) { %>
+                  <div class="answers-section">
+                    <% q.answers.forEach(a => { %>
+                      <div class="answer-card">
+                        <div class="answer-header">
+                          <strong><%= a.author.fullName %> (Tutor)</strong>
+                          <small><%= new Date(a.createdAt).toLocaleDateString() %></small>
+                        </div>
+                        <p><%= a.text %></p>
+                      </div>
+                    <% }); %>
+                  </div>
+                <% } %>
+                <% if (user.role === 'Tutor') { %>
+                  <form class="answer-form">
+                    <input type="text" placeholder="Scrivi la tua risposta..." required>
+                    <button type="submit" class="btn-primary">Rispondi</button>
+                  </form>
+                <% } %>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p>Nessuna domanda presente.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Contenuti -->
+    <div id="contentTab" class="tab-content" style="display: none;">
+      <% if (user.role === 'Tutor') { %>
+        <div class="card">
+          <form id="publishContentForm">
+            <input type="text" placeholder="Titolo del contenuto" required>
+            <textarea placeholder="Descrizione completa..." rows="5" required></textarea>
+            <button type="submit" class="btn-primary">Pubblica Contenuto</button>
+          </form>
+        </div>
+      <% } %>
+      <div id="groupContent" class="dynamic-content">
+        <% if (group.content && group.content.length > 0) { %>
+          <% group.content.forEach(c => { %>
+            <div class="card content-card" data-content-id="<%= c.id %>">
+              <h3><%= c.title %></h3>
+              <div class="content-meta">
+                <span class="chip"><%= c.author.fullName %></span>
+                <small><%= new Date(c.createdAt).toLocaleDateString() %></small>
+                <% if (user.role === 'Tutor' && user.id === group.tutor) { %>
+                  <button class="delete-content-btn" data-content-id="<%= c.id %>">🗑️ Elimina</button>
+                <% } %>
+              </div>
+              <p class="content-body"><%= c.body %></p>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <p>Nessun contenuto pubblicato nel gruppo.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>HealthEdu &copy; 2025</p>
+  </footer>
+
+  <script>
+    // Funzione per attivare la tab e salvare la scelta in localStorage
+    function activateTab(tabName, event) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName + 'Tab').style.display = 'block';
+      event.currentTarget.classList.add('active');
+      localStorage.setItem('activeTab', tabName);
+    }
+
+    // Al caricamento della pagina, ripristina la tab attiva salvata
+    window.addEventListener('load', function() {
+      const savedTab = localStorage.getItem('activeTab') || 'chat';
+      document.getElementById(savedTab + 'Tab').style.display = 'block';
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === savedTab) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    });
+
+    // Gestione dropdown utente
+    document.querySelector('.user-icon').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelector('.user-dropdown-content').classList.toggle('show');
+    });
+    document.addEventListener('click', function(e) {
+      if (!e.target.matches('.user-icon')) {
+        const dropdowns = document.getElementsByClassName('user-dropdown-content');
+        for (const dropdown of dropdowns) {
+          if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      }
+    });
+
+    // Invio domanda (Student)
+    const askForm = document.getElementById('askForm');
+    if (askForm) {
+      askForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = document.getElementById('questionInput').value;
+        const visibilityElems = document.getElementsByName('visibility');
+        let isPublic = true;
+        for (const elem of visibilityElems) {
+          if (elem.checked && elem.value === 'private') {
+            isPublic = false;
+            break;
+          }
+        }
+        const response = await fetch(`/groups/<%= group.id %>/questions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, isPublic })
+        });
+        if (response.ok) {
+          localStorage.setItem('activeTab', 'questions');
+          location.reload();
+        }
+      });
+    }
+
+    // Invio risposta (Tutor)
+    document.querySelectorAll('.answer-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = form.querySelector('input').value;
+        const questionId = form.closest('.question-card').getAttribute('data-question-id');
+        const response = await fetch(`/groups/<%= group.id %>/questions/${questionId}/answers`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (response.ok) {
+          localStorage.setItem('activeTab', 'questions');
+          location.reload();
+        }
+      });
+    });
+
+    // Pubblicazione contenuti (Tutor)
+    const publishContentForm = document.getElementById('publishContentForm');
+    if (publishContentForm) {
+      publishContentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = publishContentForm.querySelector('input').value;
+        const body = publishContentForm.querySelector('textarea').value;
+        const response = await fetch(`/groups/<%= group.id %>/content`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body })
+        });
+        if (response.ok) {
+          localStorage.setItem('activeTab', 'content');
+          location.reload();
+        }
+      });
+    }
+
+    // Eliminazione contenuto (Tutor)
+    document.querySelectorAll('.delete-content-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const contentId = this.dataset.contentId;
+        if (!contentId) return;
+        if (confirm('Sei sicuro di voler eliminare questo contenuto?')) {
+          try {
+            const response = await fetch(`/groups/<%= group.id %>/content/${contentId}/delete`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+              localStorage.setItem('activeTab', 'content');
+              location.reload();
+            } else {
+              throw new Error('Errore nella risposta del server');
+            }
+          } catch (error) {
+            console.error('Errore:', error);
+            alert('Errore durante l\'eliminazione del contenuto');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
