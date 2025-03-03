@@ -1,38 +1,41 @@
 const fs = require("fs");
 const path = require("path");
+const messagesFile = path.join(__dirname, "chatMessages.json");
 
-const filePath = path.join(__dirname, "chatMessages.json");
+let messages = {};
 
-function loadMessages() {
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify({}));
+// Carica i messaggi esistenti dal file JSON
+try {
+  if (fs.existsSync(messagesFile)) {
+    const data = fs.readFileSync(messagesFile, "utf8");
+    messages = JSON.parse(data);
   }
-  const data = fs.readFileSync(filePath);
-  try {
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Errore nel parsing di chatMessages.json:", err);
-    return {};
-  }
+} catch (err) {
+  console.error("Errore nel caricare i messaggi:", err);
+  // Creiamo un oggetto vuoto se c'è un errore
+  messages = {};
 }
 
-function saveMessages(messages) {
-  fs.writeFileSync(filePath, JSON.stringify(messages, null, 2));
+// Salva i messaggi nel file JSON
+function saveMessages() {
+  try {
+    fs.writeFileSync(messagesFile, JSON.stringify(messages, null, 2));
+  } catch (err) {
+    console.error("Errore nel salvare i messaggi:", err);
+  }
 }
 
 function addMessage(groupId, msgData) {
-  const messages = loadMessages();
   if (!messages[groupId]) {
     messages[groupId] = [];
   }
   const message = { ...msgData, timestamp: new Date() };
   messages[groupId].push(message);
-  saveMessages(messages);
+  saveMessages();
   return message;
 }
 
 function getMessages(groupId) {
-  const messages = loadMessages();
   return messages[groupId] || [];
 }
 
